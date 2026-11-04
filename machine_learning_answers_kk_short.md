@@ -87,24 +87,31 @@
 
 **Scikit-learn** жіктеу, регрессия, кластерлеу және модельді бағалау үшін тиімді. Көбіне бір компьютерде өңделетін кестелік деректерге қолданылады. Бірізді интерфейсі бірнеше алгоритмді салыстыруды жеңілдетеді.
 
-**Жоба мысалы:** Iris гүлінің түрін төрт өлшемі арқылы анықтау. Код деректерді оқыту және тест бөліктеріне бөледі. **Pipeline** стандарттау мен логистикалық регрессияны біріктіреді; масштабтау тек оқыту деректеріне сәйкестендіріледі. Accuracy тесттегі дұрыс болжамдардың үлесін көрсетеді. Кластар үлесі stratify арқылы сақталады.
+**Жоба мысалы:** студенттің қорытынды бағасын апталық дайындық сағаты және сабаққа қатысу пайызы арқылы болжау. Бұл — регрессия міндеті. Кодта түсіндіру үшін құрастырылған он студенттің деректері қолданылады. Деректер оқыту және тест бөліктеріне бөлініп, **сызықтық регрессия** моделі оқытылады. **MAE** болжамның орташа абсолюттік қатесін баллмен көрсетеді. Соңында жаңа студенттің бағасы есептеледі. Нақты қолдану үшін көбірек шынайы дерек қажет.
 
 **Менің қорытындым:** Scikit-learn бастапқы модельді тез құруға ыңғайлы, бірақ сапаны бөлек деректерде бағалау қажет.
 
 ```python
-from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
-from sklearn.pipeline import make_pipeline
-from sklearn.preprocessing import StandardScaler
-from sklearn.linear_model import LogisticRegression
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_absolute_error
 
-X, y = load_iris(return_X_y=True)
+# Белгілер: [апталық дайындық сағаты, сабаққа қатысу пайызы].
+X = [[1, 50], [2, 60], [2, 75], [3, 65], [4, 80],
+     [5, 85], [6, 90], [7, 95], [8, 90], [9, 100]]
+y = [40, 48, 58, 55, 68, 76, 84, 91, 94, 99]  # Қорытынды балл.
+
 X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, stratify=y, random_state=42
+    X, y, test_size=0.2, random_state=42
 )
-model = make_pipeline(StandardScaler(), LogisticRegression(max_iter=1000))
+model = LinearRegression()
 model.fit(X_train, y_train)
-print("Accuracy:", model.score(X_test, y_test))
+predictions = model.predict(X_test)
+print("MAE:", mean_absolute_error(y_test, predictions))
+
+# Аптасына 5 сағат дайындалатын, қатысуы 90% студент.
+new_score = model.predict([[5, 90]])[0]
+print("Болжанған балл:", round(new_score, 1))
 ```
 
 **Дереккөз:** [Scikit-learn: Getting Started](https://scikit-learn.org/stable/getting_started.html).
