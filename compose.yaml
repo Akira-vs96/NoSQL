@@ -1,0 +1,56 @@
+name: task7
+
+services:
+  mongodb:
+    image: mongo:8.0
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: library
+    volumes:
+      - mongo-data:/data/db
+      - ./mongodb.js:/docker-entrypoint-initdb.d/01-task7.js:ro
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "quit(db.adminCommand({ ping: 1 }).ok ? 0 : 1)"]
+      interval: 10s
+      timeout: 10s
+      start_period: 30s
+      retries: 10
+
+  cassandra:
+    image: cassandra:5.0
+    hostname: cassandra
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:9042:9042"
+    environment:
+      CASSANDRA_CLUSTER_NAME: Task7
+      CASSANDRA_DC: datacenter1
+      CASSANDRA_RACK: rack1
+      CASSANDRA_ENDPOINT_SNITCH: GossipingPropertyFileSnitch
+      MAX_HEAP_SIZE: 1G
+      HEAP_NEWSIZE: 256M
+    volumes:
+      - cassandra-data:/var/lib/cassandra
+    healthcheck:
+      test: ["CMD", "cqlsh", "127.0.0.1", "9042", "-e", "SELECT release_version FROM system.local;"]
+      interval: 15s
+      timeout: 15s
+      start_period: 60s
+      retries: 20
+
+  cassandra-init:
+    image: cassandra:5.0
+    restart: "no"
+    depends_on:
+      cassandra:
+        condition: service_healthy
+    volumes:
+      - ./cassandra.cql:/scripts/cassandra.cql:ro
+    entrypoint: ["cqlsh"]
+    command: ["cassandra", "9042", "-f", "/scripts/cassandra.cql"]
+
+volumes:
+  mongo-data:
+  cassandra-data:

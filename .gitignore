@@ -1,0 +1,12 @@
+# Nested clone created from this project directory
+/NoSQL/
+
+# Local agent and account configuration
+/.agents/
+/.codex/
+/.aws/
+
+# Local environment files
+.env
+.env.*
+!.env.example

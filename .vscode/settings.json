@@ -1,0 +1,13 @@
+{
+    "sqltools.connections": [
+        {
+            "server": "127.0.0.1",
+            "port": 9042,
+            "previewLimit": 50,
+            "askForPassword": false,
+            "driver": "Cassandra",
+            "name": "Task7 Cassandra",
+            "database": "university"
+        }
+    ]
+}
